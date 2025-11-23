@@ -10,13 +10,13 @@
     <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Stylesheet -->
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="./index.css" />
 
-    <!-- BABEL (TSX derleyici) -->
+    <!-- Babel Standalone (TSX/JSX derlemek için) -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- IMPORT MAPS -->
+    <!-- Import Map (CDN paketler) -->
     <script type="importmap">
     {
       "imports": {
@@ -39,11 +39,11 @@
   <body class="bg-slate-950 text-slate-200">
     <div id="root"></div>
 
-    <!-- TÜM TSX DOSYALARINI DERLEYEN MAIN ENTRY -->
+    <!-- ANA GİRİŞ DOSYASI – env preset’i ekledik, hata gitti -->
     <script
       type="text/babel"
       data-type="module"
-      data-presets="react,typescript"
+      data-presets="env,react,typescript"
       src="./index.tsx">
     </script>
   </body>
