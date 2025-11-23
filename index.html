@@ -4,33 +4,26 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Metriq360 - Firma Asistanı</title>
-
     <link rel="icon" type="image/png" href="https://i.imgur.com/DMqrCwJ.png">
-
-    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="./index.css" />
 
-    <!-- Babel Standalone -->
+    <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <!-- Import Map -->
     <script type="importmap">
     {
       "imports": {
-        "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
-        "react-dom/client": "https://aistudiocdn.com/react-dom@^19.2.0/client",
-        "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-        "react/": "https://aistudiocdn.com/react@^19.2.0/",
         "react": "https://aistudiocdn.com/react@^19.2.0",
+        "react-dom": "https://aistudiocdn.com/react-dom@^19.2.0",
+        "react-dom/client": "https://aistudiocdn.com/react-dom@^19.2.0/client",
+        "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
         "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
         "firebase/app": "https://aistudiocdn.com/firebase@^12.6.0/app",
         "firebase/auth": "https://aistudiocdn.com/firebase@^12.6.0/auth",
         "firebase/firestore": "https://aistudiocdn.com/firebase@^12.6.0/firestore",
-        "recharts": "https://aistudiocdn.com/recharts@^3.4.1",
-        "firebase/": "https://aistudiocdn.com/firebase@^12.6.0/"
+        "recharts": "https://aistudiocdn.com/recharts@^3.4.1"
       }
     }
     </script>
@@ -39,15 +32,23 @@
   <body class="bg-slate-950 text-slate-200">
     <div id="root"></div>
 
-    <!-- Ana giriş -->
-    <script
-      type="text/babel"
-      data-type="module"
-      data-presets="env,react,typescript"
-      src="./index.tsx">
+    <!-- Manuel React 19 createRoot (Babel Standalone ile en uyumlu yöntem) -->
+    <script type="module">
+      import { createRoot } from "react-dom/client";
+      import React from "react";
+      import App from "./App.tsx";
+
+      // Diğer dosyaları yükle
+      await import("./index.tsx"); // burası senin diğer importlarını yapıyor
+
+      const rootElement = document.getElementById("root");
+      if (rootElement) {
+        const root = createRoot(rootElement);
+        root.render(<React.StrictMode><App /></React.StrictMode>);
+      }
     </script>
 
-    <!-- BU KISIM REQUIRE HATASINI TAMAMEN YOK EDER -->
+    <!-- require hatasını yut (gerekirse) -->
     <script>
       window.require = window.require || function () { return {}; };
     </script>
