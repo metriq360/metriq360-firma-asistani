@@ -4,10 +4,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Metriq360 - Firma Asistanı</title>
+
     <link rel="icon" type="image/png" href="https://i.imgur.com/DMqrCwJ.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="./index.css" />
 
+    <!-- BABEL: TSX'i tarayıcıda derleyen sihirli yapı -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- IMPORT MAPS -->
     <script type="importmap">
     {
       "imports": {
@@ -26,16 +31,18 @@
     }
     </script>
   </head>
+
   <body class="bg-slate-950 text-slate-200">
     <div id="root"></div>
 
-    <script type="module">
-      import React from 'react';
-      import ReactDOM from 'react-dom/client';
-      import App from './App.tsx';   // <-- BURASI DEĞİŞMEYECEK (1. seçenek)
-
-      const root = ReactDOM.createRoot(document.getElementById('root')!);
-      root.render(<App />);
+    <!-- App.tsx burada BABEL ile derleniyor -->
+    <script
+      type="text/babel"
+      data-type="module"
+      data-presets="react,typescript"
+      src="./App.tsx">
     </script>
+
+    <!-- index.tsx görevini burada inline çözmüş olduk -->
   </body>
 </html>
