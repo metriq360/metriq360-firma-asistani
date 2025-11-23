@@ -1,11 +1,11 @@
-// React imports
+// TÜM IMPORT'LAR SADECE "import" İLE YAPILIYOR (require YOK!!)
+
 import React from "react";
 import ReactDOM from "react-dom/client";
 
-// Main App
 import App from "./App.tsx";
 
-// Component imports
+// Component'ler
 import "./DashboardViews.tsx";
 import "./AiAssistantView.tsx";
 import "./ProductAnalysisView.tsx";
@@ -13,16 +13,18 @@ import "./AnalysisView.tsx";
 import "./DataEntryView.tsx";
 import "./LayoutComponents.tsx";
 
-// Services
+// Servisler
 import "./firebaseService.ts";
 import "./geminiService.ts";
 
-// Constants
+// Sabitler
 import "./constants.ts";
 
-// Render
+// RENDER
 const rootElement = document.getElementById("root");
-if (!rootElement) throw new Error("Root element not found");
+if (!rootElement) {
+  throw new Error("Root element bulunamadı!");
+}
 
 const root = ReactDOM.createRoot(rootElement);
 root.render(
