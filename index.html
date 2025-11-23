@@ -3,20 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Metriq360 - Agency Dashboard</title>
-
+    <title>Metriq360 - Firma Asistanı</title>
     <link rel="icon" type="image/png" href="https://i.imgur.com/DMqrCwJ.png">
-
-    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Stylesheet (relative path düzgün) -->
     <link rel="stylesheet" href="./index.css" />
 
-    <!-- Babel - TSX derleyicisi -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-    <!-- Importmap -->
     <script type="importmap">
     {
       "imports": {
@@ -34,17 +25,17 @@
       }
     }
     </script>
-
-    <!-- TSX dosyasının tek ve doğru çağrımı -->
-    <script
-      type="text/babel"
-      data-type="module"
-      data-presets="react,typescript"
-      src="./index.tsx">
-    </script>
   </head>
-
   <body class="bg-slate-950 text-slate-200">
     <div id="root"></div>
+
+    <script type="module">
+      import React from 'react';
+      import ReactDOM from 'react-dom/client';
+      import App from './App.tsx';   // <-- BURASI DEĞİŞMEYECEK (1. seçenek)
+
+      const root = ReactDOM.createRoot(document.getElementById('root')!);
+      root.render(<App />);
+    </script>
   </body>
 </html>
