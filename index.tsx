@@ -5,14 +5,12 @@ import ReactDOM from "react-dom/client";
 // Main App
 import App from "./App.tsx";
 
-// --- TÜM TSX DOSYALARINI BABEL'E DAHİL EDİYORUZ ---
-
+// Component imports
 import "./DashboardViews.tsx";
 import "./AiAssistantView.tsx";
 import "./ProductAnalysisView.tsx";
 import "./AnalysisView.tsx";
 import "./DataEntryView.tsx";
-
 import "./LayoutComponents.tsx";
 
 // Services
@@ -22,15 +20,11 @@ import "./geminiService.ts";
 // Constants
 import "./constants.ts";
 
-// --------------------------------------------------
-
+// Render
 const rootElement = document.getElementById("root");
-if (!rootElement) {
-  throw new Error("Could not find root element to mount to");
-}
+if (!rootElement) throw new Error("Root element not found");
 
 const root = ReactDOM.createRoot(rootElement);
-
 root.render(
   <React.StrictMode>
     <App />
