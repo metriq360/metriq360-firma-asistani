@@ -1,85 +1,83 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Metriq360 - Özel Asistan</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Metriq360 Asistan</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html, body, #root { height: 100%; margin: 0; }
+  </style>
 </head>
-<body class="bg-slate-950 text-white min-h-screen">
-  <div id="root"></div>
+<body class="bg-gray-900 text-white">
+  <div id="root">Yükleniyor...</div>
 
   <script type="module">
-    import React from "https://esm.run/react@19"
-    import ReactDOM from "https://esm.run/react-dom@19/client"
-    import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai"
-    import { Bot, Send, User } from "https://esm.run/lucide-react"
+    import React from 'https://cdn.jsdelivr.net/npm/react@18/umd/react.development.js'
+    import ReactDOM from 'https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.development.js'
 
-    const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyCO0uAa2OqhVZCebuJlB00qF7QdrLfbjrM
-"
+    const { useState } = React
 
-    function App() {
-      const [messages, setMessages] = React.useState([])
-      const [input, setInput] = React.useState("")
-      const [loading, setLoading] = React.useState(false)
+    const App = () => {
+      const [messages, setMessages] = useState([])
+      const [input, setInput] = useState('')
+      const [loading, setLoading] = useState(false)
 
-      const sendMessage = async () => {
+      const send = async () => {
         if (!input.trim() || loading) return
-        const userMsg = input.trim()
-        setMessages(m => [...m, { role: "user", content: userMsg }])
-        setInput("")
+        const userText = input.trim()
+        setMessages(m => [...m, {text: userText, isUser: true}])
+        setInput('')
         setLoading(true)
 
+        // BURAYA SENİN GERÇEK GEMINI KEY'İNİ YAZ
+        const API_KEY = "AIzaSyCO0uAa2OqhVZCebuJlB00qF7QdrLfbjrM
+"   // ← BURAYI DEĞİŞTİR
+
         try {
-          const genAI = new GoogleGenerativeAI(GEMINI_KEY)
-          const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
-          const result = await model.generateContent(userMsg)
-          const text = result.response.text()
-          setMessages(m => [...m, { role: "assistant", content: text }])
-        } catch (err) {
-          setMessages(m => [...m, { role: "assistant", content: "Gemini şu an cevap veremiyor, key kontrol et." }])
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: userText }] }] })
+          })
+          const data = await res.json()
+          const aiText = data.candidates[0].content.parts[0].text
+          setMessages(m => [...m, {text: aiText, isUser: false}])
+        } catch(e) {
+          setMessages(m => [...m, {text: "Gemini şu an cevap veremiyor.", isUser: false}])
         }
         setLoading(false)
       }
 
       return (
         <div className="flex flex-col h-screen">
-          <header className="bg-slate-900 p-6 text-center">
-            <h1 className="text-4xl font-bold">Metriq360</h1>
-            <p className="text-green-400">Özel asistanın aktif</p>
+          <header className="bg-gray-800 p-5 text-center">
+            <h1 className="text-3xl font-bold">Metriq360 Asistan</h1>
           </header>
 
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            {messages.length === 0 && (
-              <p className="text-center text-2xl text-slate-500">Merhaba patron, ne yapalım bugün?</p>
-            )}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {messages.length === 0 && <p className="text-center text-gray-400 mt-20">Selam kanka, ne yapıyoruz bugün?</p>}
             {messages.map((m, i) => (
-              <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-2xl px-6 py-4 rounded-3xl ${m.role === "user" ? "bg-blue-600" : "bg-slate-700"}`}>
-                  {m.role === "assistant" && <Bot className="inline mr-2" size={20} />}
-                  {m.role === "user" && <User className="inline mr-2" size={20} />}
-                  {m.content}
-                </div>
+              <div key={i} className={m.isUser ? "text-right" : "text-left"}>
+                <span className={`inline-block max-w-lg px-5 py-3 rounded-2xl ${m.isUser ? "bg-blue-600" : "bg-gray-700"}`}>
+                  {m.text}
+                </span>
               </div>
             ))}
-            {loading && <p className="text-center text-slate-400">Gemini düşünüyor...</p>}
+            {loading && <p className="text-center text-gray-500">Gemini düşünüyor...</p>}
           </div>
 
-          <div className="p-6 border-t border-slate-700">
+          <div className="p-4 bg-gray-800">
             <div className="flex gap-3 max-w-4xl mx-auto">
-              <input
-                value={input}
+              <input 
+                value={input} 
                 onChange={e => setInput(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && sendMessage()}
+                onKeyDown={e => e.key === "Enter" && send()}
                 placeholder="Mesaj yaz..."
-                className="flex-1 bg-slate-800 px-6 py-4 rounded-full outline-none focus:ring-4 focus:ring-blue-500"
+                className="flex-1 bg-gray-700 px-5 py-4 rounded-full outline-none"
               />
-              <button
-                onClick={sendMessage}
-                disabled={loading}
-                className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 p-5 rounded-full transition"
-              >
-                <Send size={28} />
+              <button onClick={send} className="bg-green-600 hover:bg-green-700 px-8 py-4 rounded-full font-bold">
+                GÖNDER
               </button>
             </div>
           </div>
@@ -87,7 +85,7 @@
       )
     }
 
-    ReactDOM.createRoot(document.getElementById("root")).render(<App />)
+    ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App))
   </script>
 </body>
 </html>
