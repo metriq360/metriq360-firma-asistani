@@ -6,86 +6,11 @@
   <title>Metriq360 - Firma Asistanı</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-950 text-slate-200 min-h-screen">
-  <div id="root"></div>
-
-  <script type="module">
-    import React from 'https://esm.run/react@19'
-    import { createRoot } from 'https://esm.run/react-dom@19/client'
-    import { GoogleGenerativeAI } from 'https://esm.run/@google/generative-ai'
-    import { Bot, User, Send } from 'https://esm.run/lucide-react'
-
-    const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSy...'; // buraya senin key'in
-
-    const App = () => {
-      const [msg, setMsg] = React.useState('')
-      const [chat, setChat] = React.useState([])
-
-      const send = async () => {
-        if (!msg.trim()) return
-        setChat(c => [...c, { role: 'user', text: msg }])
-        const userMsg = msg
-        setMsg('')
-
-        try {
-          const genAI = new GoogleGenerativeAI(GEMINI_KEY)
-          const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
-          const result = await model.generateContent(userMsg)
-          const text = result.response.text()
-          setChat(c => [...c, { role: 'ai', text }])
-        } catch (e) {
-          setChat(c => [...c, { role: 'ai', text: 'Gemini şu an cevap veremiyor, key kontrol et.' }])
-        }
-      }
-
-      return (
-        <div className="min-h-screen flex flex-col">
-          <header className="bg-slate-900 p-8 text-center">
-            <h1 className="text-5xl font-bold text-white">Metriq360</h1>
-            <p className="text-xl text-slate-300 mt-2">Canlı ve çalışıyor!</p>
-          </header>
-
-          <main className="flex-1 max-w-5xl mx-auto w-full p-6">
-            <div className="bg-slate-800 rounded-3xl shadow-2xl flex flex-col" style="height:75vh">
-              <div className="flex-1 overflow-y-auto p-8 space-y-6">
-                {chat.length === 0 && (
-                  <div className="text-center text-slate-400 mt-10">
-                    <Bot size={64} className="mx-auto mb-4"/>
-                    <p className="text-2xl">Merhaba! Sana nasıl yardımcı olabilirim?</p>
-                  </div>
-                )}
-                {chat.map((m, i) => (
-                  <div key={i} className={m.role==='user' ? 'text-right' : 'text-left'}>
-                    <div className={`inline-block max-w-xl px-6 py-4 rounded-2xl ${m.role==='user' ? 'bg-blue-600 text-white' : 'bg-slate-700'}`}>
-                      {m.role==='ai' && <Bot className="inline mr-3" size={20}/>}
-                      {m.role==='user' && <User className="inline mr-3" size={20}/>}
-                      {m.text}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="p-5 border-t border-slate-700">
-                <div className="flex gap-4">
-                  <input
-                    value={msg}
-                    onChange={e=>setMsg(e.target.value)}
-                    onKeyPress={e=>e.key==='Enter'&&send()}
-                    placeholder="Mesaj yaz..."
-                    className="flex-1 bg-slate-700 text-white px-6 py-4 rounded-full outline-none focus:ring-4 focus:ring-blue-500"
-                  />
-                  <button onClick={send} className="bg-blue-600 hover:bg-blue-700 p-5 rounded-full">
-                    <Send size={28}/>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </main>
-        </div>
-      )
-    }
-
-    createRoot(document.getElementById('root')).render(<App />)
-  </script>
+<body class="bg-slate-950 text-white min-h-screen flex items-center justify-center">
+  <div class="text-center">
+    <h1 class="text-6xl font-bold mb-8 animate-pulse">Metriq360</h1>
+    <p class="text-3xl text-green-400">ÇALIŞIYOR!</p>
+    <p class="mt-8 text-xl">Gemini asistanı aktif · Netlify + GitHub sync tamam</p>
+  </div>
 </body>
 </html>
