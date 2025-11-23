@@ -4,73 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Metriq360 - Firma Asistanı</title>
-  <link rel="icon" type="image/png" href="https://i.imgur.com/DMqrCwJ.png">
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-950 text-slate-200 min-h-screen">
-  <div id="root"></div>
-  <script type="module">
-    import React from 'https://esm.run/react@19';
-    import { createRoot } from 'https://esm.run/react-dom@19/client';
-    import { GoogleGenerativeAI } from 'https://esm.run/@google/generative-ai';
-    import { Bot, User, Send } from 'https://esm.run/lucide-react';
-
-    const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyC...'; // Senin key'ini buraya yaz veya env'den al
-
-    const App = () => {
-      const [msg, setMsg] = React.useState('');
-      const [chat, setChat] = React.useState([]);
-
-      const send = async () => {
-        if (!msg.trim()) return;
-        setChat(c => [...c, { role: 'user', text: msg }]);
-        setMsg('');
-        try {
-          const genAI = new GoogleGenerativeAI(GEMINI_KEY);
-          const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-          const result = await model.generateContent(msg);
-          const text = result.response.text();
-          setChat(c => [...c, { role: 'ai', text }]);
-        } catch (e) {
-          setChat(c => [...c, { role: 'ai', text: 'Cevap veremiyorum, key kontrol et.' }]);
-        }
-      };
-
-      return (
-        <div className="min-h-screen flex flex-col">
-          <header className="bg-slate-900 p-6 text-center">
-            <h1 className="text-4xl font-bold">Metriq360 Firma Asistanı</h1>
-          </header>
-          <main className="flex-1 max-w-4xl mx-auto p-6">
-            <div className="bg-slate-800 rounded-2xl flex flex-col h-full" style="height: 70vh;">
-              <div className="flex-1 overflow-y-auto p-6 space-y-4">
-                {chat.length === 0 ? (
-                  <p className="text-center text-slate-500">Gemini'ye mesaj yaz!</p>
-                ) : (
-                  chat.map((m, i) => (
-                    <div key={i} className={m.role === 'user' ? 'text-right' : 'text-left'}>
-                      <div className={`inline-block max-w-lg px-5 py-3 rounded-2xl ${m.role === 'user' ? 'bg-blue-600' : 'bg-slate-700'}`}>
-                        {m.text}
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-              <div className="p-4 border-t border-slate-700">
-                <div className="flex gap-3">
-                  <input value={msg} onChange={e => setMsg(e.target.value)} onKeyPress={e => e.key === 'Enter' && send()} placeholder="Mesaj..." className="flex-1 bg-slate-700 px-5 py-3 rounded-full" />
-                  <button onClick={send} className="bg-blue-600 p-4 rounded-full">
-                    <Send size={24} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </main>
-        </div>
-      );
-    };
-
-    createRoot(document.getElementById('root')).render(<App />);
-  </script>
+<body class="bg-slate-950 text-slate-200 min-h-screen flex items-center justify-center">
+  <div class="text-center">
+    <h1 class="text-6xl font-bold mb-8">Metriq360 ÇALIŞIYOR!</h1>
+    <p class="text-2xl text-green-400">GitHub → Vercel sync tamam</p>
+    <p class="mt-8">Gemini asistanı 10 saniye içinde geliyor...</p>
+  </div>
 </body>
 </html>
