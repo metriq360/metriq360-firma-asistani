@@ -1,9 +1,6 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
-  "headers": [
-    {
-      "source": "/(.*)\\.tsx?",
-      "headers": [{ "key": "Content-Type", "value": "application/javascript" }]
-    }
-  ]
+  "framework": null,
+  "buildCommand": "",
+  "outputDirectory": ".",
+  "installCommand": ""
 }
