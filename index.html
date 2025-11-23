@@ -1,18 +1,104 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  >
   <meta charset="utf-8">
-  <title>Metriq360</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Metriq360 - Firma Asistanı</title>
+  <link rel="icon" type="image/png" href="https://i.imgur.com/DMqrCwJ.png">
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center">
-  <div class="text-center">
-    <h1 class="text-6xl font-bold mb-4">Metriq360</h1>
-    <p class="text-2xl">Firma asistanın birazdan burada olacak…</p>
-    <div class="mt-8 animate-pulse">
-      <div class="inline-block w-12 h-12 border-4 border-blue-500 rounded-full border-t-transparent animate-spin"></div>
-    </div>
-  </div>
+<body class="bg-slate-950 text-slate-200 min-h-screen">
+  <div id="root"></div>
+  <script type="module">
+    import React from 'https://esm.run/react@19';
+    import { createRoot } from 'https://esm.run/react-dom@19/client';
+    import { GoogleGenerativeAI } from 'https://esm.run/@google/generative-ai';
+    import { Bot, User, Send } from 'https://esm.run/lucide-react';
+
+    const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSy...'; // Vercel env'den key al, yoksa buraya gerçek key yaz
+
+    const App = () => {
+      const [message, setMessage] = React.useState('');
+      const [messages, setMessages] = React.useState([]);
+      const [loading, setLoading] = React.useState(false);
+
+      const sendMessage = async () => {
+        if (!message.trim() || loading) return;
+        const userMsg = { role: 'user', content: message };
+        setMessages(prev => [...prev, userMsg]);
+        setMessage('');
+        setLoading(true);
+
+        try {
+          const genAI = new GoogleGenerativeAI(GEMINI_KEY);
+          const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+          const result = await model.generateContent(message);
+          const response = await result.response;
+          const text = response.text();
+          setMessages(prev => [...prev, { role: 'assistant', content: text }]);
+        } catch (error) {
+          setMessages(prev => [...prev, { role: 'assistant', content: 'Üzgünüm, şu an bir hata oluştu. Tekrar dene.' }]);
+        }
+        setLoading(false);
+      };
+
+      return (
+        <div className="min-h-screen flex flex-col">
+          <header className="bg-slate-900 p-6 text-center">
+            <h1 className="text-3xl font-bold">Metriq360 Firma Asistanı</h1>
+            <p className="text-slate-400 mt-2">Yapay zeka destekli dashboard</p>
+          </header>
+          <main className="flex-1 p-6">
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-slate-800 rounded-xl p-6 space-y-4">
+                <div className="h-96 overflow-y-auto space-y-4">
+                  {messages.length === 0 ? (
+                    <div className="text-center text-slate-400 mt-20">
+                      <Bot size={48} className="mx-auto mb-4 opacity-50" />
+                      <p>Merhaba! Gemini ile sohbet etmeye hazır mısın?</p>
+                    </div>
+                  ) : (
+                    messages.map((msg, index) => (
+                      <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-md px-4 py-2 rounded-lg ${msg.role === 'user' ? 'bg-blue-600' : 'bg-slate-700'}`}>
+                          {msg.content}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                  {loading && (
+                    <div className="flex justify-start">
+                      <div className="bg-slate-700 px-4 py-2 rounded-lg">
+                        <div className="flex space-x-1">
+                          <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
+                          <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-100"></div>
+                          <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-200"></div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                    placeholder="Mesajınızı yazın..."
+                    className="flex-1 bg-slate-700 text-white px-4 py-2 rounded-lg outline-none"
+                  />
+                  <button onClick={sendMessage} disabled={loading} className="bg-blue-600 disabled:opacity-50 px-6 py-2 rounded-lg hover:bg-blue-700">
+                    <Send size={20} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      );
+    };
+
+    createRoot(document.getElementById('root')).render(<App />);
+  </script>
 </body>
 </html>
