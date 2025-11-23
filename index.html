@@ -9,96 +9,72 @@
 </head>
 <body class="bg-slate-950 text-slate-200 min-h-screen">
   <div id="root"></div>
-  <script type="module">
-    import React from 'https://esm.run/react@19';
-    import { createRoot } from 'https://esm.run/react-dom@19/client';
-    import { GoogleGenerativeAI } from 'https://esm.run/@google/generative-ai';
-    import { Bot, User, Send } from 'https://esm.run/lucide-react';
 
-    const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSy...'; // Vercel env'den key al, yoksa buraya gerçek key yaz
+  <script type="module">
+    import React from 'https://esm.run/react@19'
+    import { createRoot } from 'https://esm.run/react-dom@19/client'
+    import { GoogleGenerativeAI } from 'https://esm.run/@google/generative-ai'
+    import { Bot, User, Send } from 'https://esm.run/lucide-react'
+
+    const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'BURAYA_KEYİNİ_YAZ'  // ← senin key
 
     const App = () => {
-      const [message, setMessage] = React.useState('');
-      const [messages, setMessages] = React.useState([]);
-      const [loading, setLoading] = React.useState(false);
+      const [msg, setMsg] = React.useState('')
+      const [chat, setChat] = React.useState([])
 
-      const sendMessage = async () => {
-        if (!message.trim() || loading) return;
-        const userMsg = { role: 'user', content: message };
-        setMessages(prev => [...prev, userMsg]);
-        setMessage('');
-        setLoading(true);
+      const send = async () => {
+        if (!msg.trim()) return
+        setChat(c => [...c, { role: 'user', text: msg }])
+        const userMsg = msg
+        setMsg('')
 
         try {
-          const genAI = new GoogleGenerativeAI(GEMINI_KEY);
-          const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-          const result = await model.generateContent(message);
-          const response = await result.response;
-          const text = response.text();
-          setMessages(prev => [...prev, { role: 'assistant', content: text }]);
-        } catch (error) {
-          setMessages(prev => [...prev, { role: 'assistant', content: 'Üzgünüm, şu an bir hata oluştu. Tekrar dene.' }]);
+          const genAI = new GoogleGenerativeAI(GEMINI_KEY)
+          const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
+          const result = await model.generateContent(userMsg)
+          const text = result.response.text()
+          setChat(c => [...c, { role: 'ai', text }])
+        } catch (e) {
+          setChat(c => [...c, { role: 'ai', text: 'Gemini şu an cevap veremiyor.' }])
         }
-        setLoading(false);
-      };
+      }
 
       return (
         <div className="min-h-screen flex flex-col">
           <header className="bg-slate-900 p-6 text-center">
-            <h1 className="text-3xl font-bold">Metriq360 Firma Asistanı</h1>
-            <p className="text-slate-400 mt-2">Yapay zeka destekli dashboard</p>
+            <h1 className="text-4xl font-bold text-white">Metriq360</h1>
+            <p className="text-slate-400">Yapay zeka asistanın hazır!</p>
           </header>
-          <main className="flex-1 p-6">
-            <div className="max-w-4xl mx-auto">
-              <div className="bg-slate-800 rounded-xl p-6 space-y-4">
-                <div className="h-96 overflow-y-auto space-y-4">
-                  {messages.length === 0 ? (
-                    <div className="text-center text-slate-400 mt-20">
-                      <Bot size={48} className="mx-auto mb-4 opacity-50" />
-                      <p>Merhaba! Gemini ile sohbet etmeye hazır mısın?</p>
+          <main className="flex-1 max-w-4xl mx-auto w-full p-6">
+            <div className="bg-slate-800 rounded-2xl shadow-2xl flex flex-col h-full" style="max-height: 80vh;">
+              <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                {chat.length === 0 && <p className="text-center text-slate-500">Merhaba! Nasıl yardımcı olabilirim?</p>}
+                {chat.map((m, i) => (
+                  <div key={i} className={m.role === 'user' ? 'text-right' : 'text-left'}>
+                    <div className={`inline-block max-w-lg px-5 py-3 rounded-2xl ${m.role === 'user' ? 'bg-blue-600 text-white' : 'bg-slate-700'}`}>
+                      {m.role === 'ai' && <Bot className="inline mr-2" size={18} />}
+                      {m.role === 'user' && <User className="inline mr-2" size={18} />}
+                      {m.text}
                     </div>
-                  ) : (
-                    messages.map((msg, index) => (
-                      <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-md px-4 py-2 rounded-lg ${msg.role === 'user' ? 'bg-blue-600' : 'bg-slate-700'}`}>
-                          {msg.content}
-                        </div>
-                      </div>
-                    ))
-                  )}
-                  {loading && (
-                    <div className="flex justify-start">
-                      <div className="bg-slate-700 px-4 py-2 rounded-lg">
-                        <div className="flex space-x-1">
-                          <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
-                          <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-100"></div>
-                          <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-200"></div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                    placeholder="Mesajınızı yazın..."
-                    className="flex-1 bg-slate-700 text-white px-4 py-2 rounded-lg outline-none"
-                  />
-                  <button onClick={sendMessage} disabled={loading} className="bg-blue-600 disabled:opacity-50 px-6 py-2 rounded-lg hover:bg-blue-700">
-                    <Send size={20} />
+                  </div>
+                ))}
+              </div>
+              <div className="p-4 border-t border-slate-700">
+                <div className="flex gap-3">
+                  <input value={msg} onChange={e => setMsg(e.target.value)} onKeyPress={e => e.key==='Enter' && send()}
+                    placeholder="Mesaj yaz..." className="flex-1 bg-slate-700 text-white px-5 py-3 rounded-full outline-none" />
+                  <button onClick={send} className="bg-blue-600 hover:bg-blue-700 p-4 rounded-full">
+                    <Send size={24} />
                   </button>
                 </div>
               </div>
             </div>
           </main>
         </div>
-      );
-    };
+      )
+    }
 
-    createRoot(document.getElementById('root')).render(<App />);
+    createRoot(document.getElementById('root')).render(<App />)
   </script>
 </body>
 </html>
