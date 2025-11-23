@@ -1,132 +1,85 @@
 <!DOCTYPE html>
 <html lang="tr">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Metriq360 - Firma Asistanı</title>
-    <link rel="icon" type="image/png" href="https://i.imgur.com/DMqrCwJ.png">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="./index.css" />
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Metriq360 - Firma Asistanı</title>
+  <link rel="icon" type="image/png" href="https://i.imgur.com/DMqrCwJ.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-200">
+  <div id="root"></div>
 
-    <script type="importmap">
-    {
-      "imports": {
-        "react": "https://esm.run/react@19",
-        "react-dom/client": "https://esm.run/react-dom@19/client",
-        "@google/genai": "https://esm.run/@google/generative-ai",
-        "lucide-react": "https://esm.run/lucide-react",
-        "firebase/app": "https://esm.run/firebase@10/app",
-        "firebase/auth": "https://esm.run/firebase@10/auth",
-        "firebase/firestore": "https://esm.run/firebase@10/firestore",
-        "recharts": "https://esm.run/recharts"
+  <!-- TÜM UYGULAMA BURADA – HİÇBİR .TSX DOSYASI YOK -->
+  <script type="module">
+    import React from 'https://esm.run/react@19'
+    import ReactDOM from 'https://esm.run/react-dom@19/client'
+    import { GoogleGenerativeAI } from 'https://esm.run/@google/generative-ai'
+    import { MessageCircle, Send, Bot, User } from 'https://esm.run/lucide-react'
+
+    const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSy...'; // senin key'in
+
+    const App = () => {
+      const [msg, setMsg] = React.useState('')
+      const [chat, setChat] = React.useState([])
+
+      const send = async () => {
+        if (!msg.trim()) return
+        const user = { role: 'user', text: msg }
+        setChat(c => [...c, user])
+        setMsg('')
+
+        try {
+          const genAI = new GoogleGenerativeAI(GEMINI_KEY)
+          const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
+          const result = await model.generateContent(msg)
+          const text = result.response.text()
+          setChat(c => [...c, { role: 'ai', text }])
+        } catch (e) {
+          setChat(c => [...c, { role: 'ai', text: 'Gemini şu an cevap veremiyor.' }])
+        }
       }
-    }
-    </script>
-  </head>
-  <body class="bg-slate-950 text-slate-200">
-    <div id="root"></div>
 
-    <!-- TÜM KOD BURADA – DIŞARIDAN HİÇBİR DOSYA ÇEKİLMİYOR -->
-    <script type="text/babel" data-presets="env,react,typescript">
-      import React from 'react';
-      import { createRoot } from 'react-dom/client';
-      import { GoogleGenerativeAI } from '@google/genai';
-      import { MessageCircle, Send, Bot, User, Menu, X, Home, BarChart3, Brain, FileText, Settings } from 'lucide-react';
-
-      // GEMINI KEY (Vercel Environment Variables'dan alıyor)
-      const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY || "BURAYA_KEY_GELDİĞİNDE_SİL";
-
-      const genAI = new GoogleGenerativeAI(GEMINI_KEY);
-
-      function App() {
-        const [message, setMessage] = React.useState("");
-        const [messages, setMessages] = React.useState([]);
-        const [loading, setLoading] = React.useState(false);
-
-        const sendMessage = async () => {
-          if (!message.trim() || loading) return;
-          const userMsg = { role: "user", content: message };
-          setMessages(prev => [...prev, userMsg]);
-          setLoading(true);
-          setMessage("");
-
-          try {
-            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-            const result = await model.generateContent(message);
-            const response = await result.response;
-            const text = response.text();
-            setMessages(prev => [...prev, { role: "assistant", content: text }]);
-          } catch (err) {
-            setMessages(prev => [...prev, { role: "assistant", content: "Gemini şu an cevap veremiyor, biraz sonra tekrar dene." }]);
-          }
-          setLoading(false);
-        };
-
-        return (
-          <div className="min-h-screen flex flex-col">
-            <header className="bg-slate-900 p-6 text-center">
-              <h1 className="text-3xl font-bold text-white">Metriq360 - Firma Asistanı</h1>
-              <p className="text-slate-400 mt-2">Sana özel yapay zeka asistanın</p>
-            </header>
-
-            <main className="flex-1 max-w-4xl mx-auto w-full p-4">
-              <div className="bg-slate-800 rounded-xl shadow-2xl h-full flex flex-col" style={{maxHeight: "80vh"}}>
-                <div className="flex-1 overflow-y-auto p-6 space-y-4">
-                  {messages.length === 0 && (
-                    <div className="text-center text-slate-500 mt-10">
-                      <Bot size={64} className="mx-auto mb-4 opacity-50" />
-                      <p>Merhaba! Sana nasıl yardımcı olabilirim?</p>
-                    </div>
-                  )}
-                  {messages.map((m, i) => (
-                    <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-xs lg:max-w-lg px-4 py-3 rounded-2xl ${m.role === 'user' ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-200'}`}>
-                        {m.role === 'assistant' && <Bot className="inline mr-2" size={16} />}
-                        {m.role === 'user' && <User className="inline mr-2" size={16} />}
-                        {m.content}
-                      </div>
-                    </div>
-                  ))}
-                  {loading && (
-                    <div className="flex justify-start">
-                      <div className="bg-slate-700 px-4 py-3 rounded-2xl">
-                        <div className="flex space-x-2">
-                          <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
-                          <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-100"></div>
-                          <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-200"></div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="p-4 border-t border-slate-700">
-                  <div className="flex gap-3">
-                    <input
-                      type="text"
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                      placeholder="Mesajını yaz..."
-                      className="flex-1 bg-slate-700 text-white px-5 py-3 rounded-full outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <button
-                      onClick={sendMessage}
-                      disabled={loading}
-                      className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 p-4 rounded-full transition"
-                    >
-                      <Send size={24} />
-                    </button>
+      return (
+        <div className="min-h-screen flex flex-col">
+          <header className="bg-slate-900 p-6 text-center">
+            <h1 className="text-3xl font-bold text-white">Metriq360</h1>
+          </header>
+          <main className="flex-1 max-w-4xl mx-auto w-full p-4">
+            <div className="bg-slate-800 rounded-xl h-full flex flex-col" style={{maxHeight: '80vh'}}>
+              <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                {chat.length === 0 && <p className="text-center text-slate-500">Merhaba! Nasıl yardımcı olabilirim?</p>}
+                {chat.map((m, i) => (
+                  <div key={i} className={m.role === 'user' ? 'text-right' : 'text-left'}>
+                    <span className={`inline-block max-w-lg px-4 py-3 rounded-2xl ${m.role === 'user' ? 'bg-blue-600' : 'bg-slate-700'}`}>
+                      {m.role === 'ai' && <Bot className="inline mr-2" size={18} />}
+                      {m.role === 'user' && <User className="inline mr-2" size={18} />}
+                      {m.text}
+                    </span>
                   </div>
+                ))}
+              </div>
+              <div className="p-4 border-t border-slate-700">
+                <div className="flex gap-3">
+                  <input
+                    value={msg}
+                    onChange={e => setMsg(e.target.value)}
+                    onKeyPress={e => e.key === 'Enter' && send()}
+                    placeholder="Mesaj yaz..."
+                    className="flex-1 bg-slate-700 px-5 py-3 rounded-full outline-none text-white"
+                  />
+                  <button onClick={send} className="bg-blue-600 hover:bg-blue-700 p-4 rounded-full">
+                    <Send size={24} />
+                  </button>
                 </div>
               </div>
-            </main>
-          </div>
-        );
-      }
+            </div>
+          </main>
+        </div>
+      )
+    }
 
-      createRoot(document.getElementById('root')).render(<App />);
-    </script>
-  </body>
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />)
+  </script>
+</body>
 </html>
