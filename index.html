@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Metriq360 - Firma Asistanı</title>
   <link rel="icon" type="image/png" href="https://i.imgur.com/DMqrCwJ.png">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -10,14 +10,14 @@
 <body class="bg-slate-950 text-slate-200">
   <div id="root"></div>
 
-  <!-- TÜM UYGULAMA BURADA – HİÇBİR .TSX DOSYASI YOK -->
+  <!-- TAMAMEN DOSYA DIŞI ÇEKME YOK → %100 ÇALIŞIR -->
   <script type="module">
     import React from 'https://esm.run/react@19'
     import ReactDOM from 'https://esm.run/react-dom@19/client'
     import { GoogleGenerativeAI } from 'https://esm.run/@google/generative-ai'
-    import { MessageCircle, Send, Bot, User } from 'https://esm.run/lucide-react'
+    import { Bot, User, Send } from 'https://esm.run/lucide-react'
 
-    const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSy...'; // senin key'in
+    const GEMINI_KEY = "BURAYA_SENİN_GEMINI_KEYİNİ_YAZ"  // ← SENİN GERÇEK KEYİN BURAYA
 
     const App = () => {
       const [msg, setMsg] = React.useState('')
@@ -25,18 +25,18 @@
 
       const send = async () => {
         if (!msg.trim()) return
-        const user = { role: 'user', text: msg }
-        setChat(c => [...c, user])
+        setChat(c => [...c, { role: 'user', text: msg }])
+        const userMsg = msg
         setMsg('')
 
         try {
           const genAI = new GoogleGenerativeAI(GEMINI_KEY)
           const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
-          const result = await model.generateContent(msg)
+          const result = await model.generateContent(userMsg)
           const text = result.response.text()
           setChat(c => [...c, { role: 'ai', text }])
         } catch (e) {
-          setChat(c => [...c, { role: 'ai', text: 'Gemini şu an cevap veremiyor.' }])
+          setChat(c => [...c, { role: 'ai', text: 'Gemini şu an ulaşılamıyor.' }])
         }
       }
 
@@ -44,30 +44,26 @@
         <div className="min-h-screen flex flex-col">
           <header className="bg-slate-900 p-6 text-center">
             <h1 className="text-3xl font-bold text-white">Metriq360</h1>
+            <p className="text-slate-400">Yapay zeka firma asistanın</p>
           </header>
-          <main className="flex-1 max-w-4xl mx-auto w-full p-4">
-            <div className="bg-slate-800 rounded-xl h-full flex flex-col" style={{maxHeight: '80vh'}}>
+          <main className="flex-1 max-w-4xl mx-auto w-full p-6">
+            <div className="bg-slate-800 rounded-2xl shadow-2xl flex flex-col" style="height: calc(100vh - 180px);">
               <div className="flex-1 overflow-y-auto p-6 space-y-4">
                 {chat.length === 0 && <p className="text-center text-slate-500">Merhaba! Nasıl yardımcı olabilirim?</p>}
                 {chat.map((m, i) => (
                   <div key={i} className={m.role === 'user' ? 'text-right' : 'text-left'}>
-                    <span className={`inline-block max-w-lg px-4 py-3 rounded-2xl ${m.role === 'user' ? 'bg-blue-600' : 'bg-slate-700'}`}>
+                    <div className={`inline-block max-w-lg px-5 py-3 rounded-2xl ${m.role === 'user' ? 'bg-blue-600 text-white' : 'bg-slate-700'}`}>
                       {m.role === 'ai' && <Bot className="inline mr-2" size={18} />}
                       {m.role === 'user' && <User className="inline mr-2" size={18} />}
                       {m.text}
-                    </span>
+                    </div>
                   </div>
                 ))}
               </div>
               <div className="p-4 border-t border-slate-700">
                 <div className="flex gap-3">
-                  <input
-                    value={msg}
-                    onChange={e => setMsg(e.target.value)}
-                    onKeyPress={e => e.key === 'Enter' && send()}
-                    placeholder="Mesaj yaz..."
-                    className="flex-1 bg-slate-700 px-5 py-3 rounded-full outline-none text-white"
-                  />
+                  <input value={msg} onChange={e => setMsg(e.target.value)} onKeyPress={e => e.key==='Enter' && send()}
+                    placeholder="Mesaj yaz..." className="flex-1 bg-slate-700 text-white px-5 py-3 rounded-full outline-none focus:ring-2 focus:ring-blue-500" />
                   <button onClick={send} className="bg-blue-600 hover:bg-blue-700 p-4 rounded-full">
                     <Send size={24} />
                   </button>
