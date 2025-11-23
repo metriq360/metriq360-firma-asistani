@@ -13,10 +13,10 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="./index.css" />
 
-    <!-- Babel Standalone (TSX/JSX derlemek için) -->
+    <!-- Babel Standalone -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- Import Map (CDN paketler) -->
+    <!-- Import Map -->
     <script type="importmap">
     {
       "imports": {
@@ -39,12 +39,17 @@
   <body class="bg-slate-950 text-slate-200">
     <div id="root"></div>
 
-    <!-- ANA GİRİŞ DOSYASI – env preset’i ekledik, hata gitti -->
+    <!-- Ana giriş -->
     <script
       type="text/babel"
       data-type="module"
       data-presets="env,react,typescript"
       src="./index.tsx">
+    </script>
+
+    <!-- BU KISIM REQUIRE HATASINI TAMAMEN YOK EDER -->
+    <script>
+      window.require = window.require || function () { return {}; };
     </script>
   </body>
 </html>
