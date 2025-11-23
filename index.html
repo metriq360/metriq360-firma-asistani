@@ -13,7 +13,6 @@
     {
       "imports": {
         "react": "https://esm.run/react@19",
-        "react-dom": "https://esm.run/react-dom@19",
         "react-dom/client": "https://esm.run/react-dom@19/client",
         "@google/genai": "https://esm.run/@google/generative-ai",
         "lucide-react": "https://esm.run/lucide-react",
@@ -28,16 +27,79 @@
   <body class="bg-slate-950 text-slate-200">
     <div id="root"></div>
 
-    <script type="module">
+    <!-- TÜM UYGULAMAYI BURAYA GÖMDÜK, DIŞARIDAN .tsx ÇEKME YOK -->
+    <script type="text/babel" data-presets="env,react,typescript">
       import React from 'react';
       import { createRoot } from 'react-dom/client';
-      import App from './App.tsx';
+      import { GoogleGenerativeAI } from '@google/genai';
+      import { initializeApp } from 'firebase/app';
+      import { getAuth } from 'firebase/auth';
+      import { getFirestore } from 'firebase/firestore';
+      import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+      import { MessageCircle, Send, Bot, User, Menu, X, Home, BarChart3, Brain, FileText, Settings } from 'lucide-react';
 
-      createRoot(document.getElementById('root')).render(
-        <React.StrictMode>
-          <App />
-        </React.StrictMode>
-      );
+      // Firebase config (senin kendi config'in buraya gelecek)
+      const firebaseConfig = { /* BURAYA KENDİ FİREBASE CONFIG'İNİ YAZ */ };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+      const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || "YOUR_KEY");
+
+      // App bileşeni (kısaltılmış örnek, senin tam App.tsx içeriğini buraya yapıştır)
+      function App() {
+        const [message, setMessage] = React.useState("");
+        const [messages, setMessages] = React.useState([]);
+
+        const sendMessage = async () => {
+          if (!message.trim()) return;
+          const userMsg = { role: "user", content: message };
+          setMessages(prev => [...prev, userMsg]);
+          setMessage("");
+
+          const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+          const result = await model.generateContent(message);
+          const response = await result.response;
+          const text = response.text();
+          setMessages(prev => [...prev, { role: "assistant", content: text }]);
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col">
+            <header className="bg-slate-900 p-4 text-white">
+              <h1 className="text-2xl font-bold">Metriq360 - Firma Asistanı</h1>
+            </header>
+            <main className="flex-1 p-4">
+              <div className="max-w-4xl mx-auto">
+                <div className="bg-slate-800 rounded-lg p-6">
+                  {messages.map((m, i) => (
+                    <div key={i} className={`mb-4 flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${m.role === 'user' ? 'bg-blue-600' : 'bg-slate-700'}`}>
+                        {m.content}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 flex gap-2">
+                  <input
+                    type="text"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                    className="flex-1 bg-slate-800 text-white px-4 py-2 rounded-lg outline-none"
+                    placeholder="Mesaj yaz..."
+                  />
+                  <button onClick={sendMessage} className="bg-blue-600 hover:bg-blue-700 p-3 rounded-lg">
+                    <Send size={20} />
+                  </button>
+                </div>
+              </div>
+            </main>
+          </div>
+        );
+      }
+
+      createRoot(document.getElementById('root')).render(<App />);
     </script>
   </body>
 </html>
