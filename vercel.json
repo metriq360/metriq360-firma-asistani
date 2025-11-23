@@ -1,17 +1,8 @@
 {
-  "framework": null,
-  "buildCommand": "",
-  "outputDirectory": ".",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ],
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
   "headers": [
     {
-      "source": "(.*)\\.tsx",
-      "headers": [{ "key": "Content-Type", "value": "application/javascript" }]
-    },
-    {
-      "source": "(.*)\\.ts",
+      "source": "/(.*)\\.tsx?",
       "headers": [{ "key": "Content-Type", "value": "application/javascript" }]
     }
   ]

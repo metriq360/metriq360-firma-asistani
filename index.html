@@ -7,50 +7,37 @@
     <link rel="icon" type="image/png" href="https://i.imgur.com/DMqrCwJ.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="./index.css" />
-
-    <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- Import Map -->
     <script type="importmap">
     {
       "imports": {
-        "react": "https://aistudiocdn.com/react@^19.2.0",
-        "react-dom": "https://aistudiocdn.com/react-dom@^19.2.0",
-        "react-dom/client": "https://aistudiocdn.com/react-dom@^19.2.0/client",
-        "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
-        "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
-        "firebase/app": "https://aistudiocdn.com/firebase@^12.6.0/app",
-        "firebase/auth": "https://aistudiocdn.com/firebase@^12.6.0/auth",
-        "firebase/firestore": "https://aistudiocdn.com/firebase@^12.6.0/firestore",
-        "recharts": "https://aistudiocdn.com/recharts@^3.4.1"
+        "react": "https://esm.run/react@19",
+        "react-dom": "https://esm.run/react-dom@19",
+        "react-dom/client": "https://esm.run/react-dom@19/client",
+        "@google/genai": "https://esm.run/@google/generative-ai",
+        "lucide-react": "https://esm.run/lucide-react",
+        "firebase/app": "https://esm.run/firebase@10/app",
+        "firebase/auth": "https://esm.run/firebase@10/auth",
+        "firebase/firestore": "https://esm.run/firebase@10/firestore",
+        "recharts": "https://esm.run/recharts"
       }
     }
     </script>
   </head>
-
   <body class="bg-slate-950 text-slate-200">
     <div id="root"></div>
 
-    <!-- Manuel React 19 createRoot (Babel Standalone ile en uyumlu yöntem) -->
     <script type="module">
-      import { createRoot } from "react-dom/client";
-      import React from "react";
-      import App from "./App.tsx";
+      import React from 'react';
+      import { createRoot } from 'react-dom/client';
+      import App from './App.tsx';
 
-      // Diğer dosyaları yükle
-      await import("./index.tsx"); // burası senin diğer importlarını yapıyor
-
-      const rootElement = document.getElementById("root");
-      if (rootElement) {
-        const root = createRoot(rootElement);
-        root.render(<React.StrictMode><App /></React.StrictMode>);
-      }
-    </script>
-
-    <!-- require hatasını yut (gerekirse) -->
-    <script>
-      window.require = window.require || function () { return {}; };
+      createRoot(document.getElementById('root')).render(
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>
+      );
     </script>
   </body>
 </html>
